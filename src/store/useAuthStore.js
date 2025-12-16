@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
+  onlineUsers: [],
 
   // for loaders
   isCheckingAuth: true,
@@ -33,7 +33,7 @@ export const useAuthStore = create((set) => ({
       set({ authUser: res.data });
     } catch (error) {
       console.log("Error in signin: ", error.message);
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.message  || "Something went wrong");
     } finally {
       set({ isSigningUp: false });
     }
@@ -47,7 +47,7 @@ export const useAuthStore = create((set) => ({
       set({ authUser: res.data });
     } catch (error) {
       console.log("Error in login: ", error.message);
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.message || "Something went wrong");
     } finally {
       set({ isLoggingIn: false });
     }
@@ -60,7 +60,7 @@ export const useAuthStore = create((set) => ({
       toast.success("Logged out successfully");
     } catch (error) {
       console.log(
-        "Something went wrong when logout",
+        "Something went wrong when logout: ",
         error.response.data.message
       );
     }
@@ -74,8 +74,7 @@ export const useAuthStore = create((set) => ({
       toast.success("Profile updated successfully")
     } catch (error) {
       console.log("Error in update profile: ", error);
-      
-      toast.error(error.response.data.message)
+      toast.error(error.response.data.message  || "Something went wrong")
     } finally {
       set({ isUpdatingProfile: false });
     }
