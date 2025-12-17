@@ -2,7 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 
-export const useChatStore = create((set) => ({
+export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
   selectedUser: null,
@@ -12,7 +12,7 @@ export const useChatStore = create((set) => ({
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
-      const res = await axiosInstance.get("/message/users");
+      const res = await axiosInstance.get("/messages/users");
       set({ users: res.data });
     } catch (error) {
       toast.error(error.response.data.message);
@@ -24,7 +24,7 @@ export const useChatStore = create((set) => ({
   getMessages: async (userId) => {
     set({ isMessagesLoading: true });
     try {
-      const res = await axiosInstance.get(`/message/${userId}`);
+      const res = await axiosInstance.get(`/messages/${userId}`);
       set({ messageg: res.data });
     } catch (error) {
       toast.error();
@@ -33,6 +33,21 @@ export const useChatStore = create((set) => ({
     }
   },
 
+  sendMessage: async (messageData) => {
+    const { selectedUser, messages } = get();
+    try {
+      const res = await axiosInstance.post(
+        `/messages/send/${selectedUser._id}`,
+        messageData
+      );
+      console.log(res.data);
+      
+      set({ messages: [...messages, res.data] });
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  },
+
   // optimize this one later
-  setSelectedUser: async (selectedUser) => ({selectedUser}),
+  setSelectedUser: async (selectedUser) => set({ selectedUser }),
 }));
